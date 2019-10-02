@@ -9,6 +9,10 @@ HISTSIZE=10000
 SAVEHIST=1000
 setopt SHARE_HISTORY
 
+export fpath=($HOME/.autoload $fpath)
+
+autoload -Uz _tmux_pane_words
+
 export FZF_BASE=/home/vincent/.fzf
 export OMNIVIM_EDITOR=nvim
 PLANG='ruby'
@@ -17,10 +21,13 @@ PLANG_EXT='rb'
 HISTSIZE=1000
 SAVEHIST=1000
 
+autoload zmv
 setopt kshglob
 setopt auto_cd
 setopt prompt_subst # Make sure prompt is able to be generated properly.
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+
+exec 2>>( while read X; do print "\e[1;31m${X}\e[0m" > /dev/tty; done & )
 
 zplug "caiogondim/bullet-train.zsh", use:bullet-train.zsh-theme, defer:3 # defer until other plugins like oh-my-zsh is loaded
 BULLETTRAIN_PROMPT_ORDER=(
@@ -37,7 +44,7 @@ bindkey -M viins 'jk' vi-cmd-mode
 zplug "plugins/bundler", from:oh-my-zsh
 zplug "plugins/colored-man-pages", from:oh-my-zsh
 zplug "plugins/colorize", from:oh-my-zsh
-zplug "plugins/common"-aliases, from:oh-my-zsh
+zplug "plugins/common-aliases", from:oh-my-zsh
 zplug "plugins/fzf", from:oh-my-zsh
 zplug "plugins/pip", from:oh-my-zsh
 zplug "plugins/python", from:oh-my-zsh
@@ -68,10 +75,6 @@ zplug load
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_COMPLETION_TRIGGER=''
-bindkey '^T' fzf-completion
-bindkey '^I' $fzf_default_completion
-
-bindkey -s '^O' 'lf\n'
 
 zsa() {
    echo "\n$1\n" >> ~/.zshrc
@@ -87,7 +90,7 @@ ign() { curl -sLw n https://www.gitignore.io/api/$@ ;}
 
 fancy-ctrl-z () {
     if [[ $#BUFFER -eq 0 ]]; then
-        BUFFER="fg"
+        BUFFER=" fg"
         zle accept-line
     else
         zle push-input
@@ -108,27 +111,43 @@ magic-enter () {
 zle -N magic-enter
 bindkey '^J' magic-enter
 
+bindkey '^[f' forward-word
+bindkey '^[b' backward-word
+bindkey '^F' forward-char
+bindkey '^B' backward-char
+bindkey '^K' kill-line
+bindkey '^U' kill-whole-line
 
-alias gi="sudo gem install"
-alias tau="tar -zxvf"
-alias info="info --vi-keys"
-alias e=$EDITOR
-alias -g Y='| tmux loadb -'
-alias P="tmux saveb -"
-alias rn='ranger'
+bindkey '^T' fzf-completion
+bindkey '^I' $fzf_default_completion
+
+bindkey -s '^O' ' lf\n'
+
 alias -g HE='--help | less'
-alias publicip='curl https://ipinfo.io/ip'
 alias -g L='| cless'
-alias red='ruby -pe'
-alias ov='python ~/bin/omnivim.py'
-alias psa='ps aux | sort -nrk 3,3 | head -n 5'
-alias ra='ri -a'
+alias -g NE='2 > /dev/null'
+alias -g NUL='> /dev/null 2>&1'
+alias -g Y='| tmux loadb -'
+alias -s {yml,yaml,rb}=nvim
+alias P="tmux saveb -"
+alias e=$EDITOR
 alias g=hub
-alias ls='ls --color'
-alias inf=pinfo
-alias se='sed -s -n -E'
 alias gc='git commit -m'
-
-
+alias gi="sudo gem install"
+alias inf=pinfo
+alias info="info --vi-keys"
+alias ls='ls --color'
+alias ov='python ~/bin/omnivim.py'
+alias please='sudo'
+alias psa='ps aux | sort -nrk 3,3 | head -n 5'
+alias publicip='curl https://ipinfo.io/ip'
+alias ra='ri -a'
+alias red='ruby -pe'
+alias rn='ranger'
+alias se='sed -s -n -E'
 alias so='socli -siq'
+alias tau="tar -zxvf"
 
+export ATHAME_ENABLED=0
+
+export LC_ALL=en_US.UTF-8

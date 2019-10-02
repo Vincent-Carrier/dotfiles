@@ -1,12 +1,8 @@
-# Using these pry gems
-# gem "pry"
-# gem "pry-rails"
-# gem "pry-byebug"
-# gem "pry-stack_explorer"
-# gem "pry-doc"
-# gem "pry-state"
-# gem "pry-toys"
-# gem "pry-rescue"
+require "pry-byebug"
+require "pry-stack_explorer"
+require "pry-doc"
+require "pry-rescue"
+require "pry-inline"
 
 Pry.config.color = true
 Pry.config.prompt_name = File.basename(Dir.pwd)
@@ -59,13 +55,13 @@ if defined?(::Rails) && Rails.env && Rails.env.test? && ENV["PRY_LONG"].blank?
   pry_debug
 end
 
-begin
-  require 'awesome_print'
-  Pry.config.print = proc { |output, value| output.puts value.ai }
-  AwesomePrint.pry!
-rescue LoadError => err
-  puts "no awesome_print :("
-end
+# begin
+#   require 'awesome_print'
+#   Pry.config.print = proc { |output, value| output.p value.ai }
+#   AwesomePrint.pry!
+# rescue LoadError => err
+#   puts "no awesome_print :("
+# end
 
 
 # Hit Enter to repeat last command
