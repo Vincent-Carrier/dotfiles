@@ -3,6 +3,59 @@ if empty(glob('~/.vim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall | source ~/.vimrc
 endif
 
+call plug#begin()
+
+Plug 'Julian/vim-textobj-variable-segment'
+Plug 'Shougo/neco-vim'
+Plug 'airblade/vim-gitgutter'
+Plug 'chaoren/vim-wordmotion'
+Plug 'andrewradev/splitjoin.vim'
+Plug 'dominikduda/vim_current_word'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'flazz/vim-colorschemes'
+Plug 'gilligan/textobj-gitgutter'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'justinmk/vim-sneak'
+Plug 'kana/vim-textobj-entire'
+Plug 'kana/vim-textobj-user'
+Plug 'liuchengxu/vim-which-key'
+Plug 'machakann/vim-highlightedyank'
+Plug 'markonm/traces.vim'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/asyncomplete-necovim.vim'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'raimondi/delimitmate'
+Plug 'rbgrouleff/bclose.vim'
+Plug 'roxma/vim-tmux-clipboard'
+Plug 'ryanoasis/vim-devicons'
+Plug 'saaguero/vim-textobj-pastedtext'
+Plug 'szw/vim-maximizer'
+Plug 'tek/vim-textobj-ruby'
+Plug 'thaerkh/vim-workspace'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-projectionist'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-rsi'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'wellle/targets.vim'
+Plug 'wellle/tmux-complete.vim'
+Plug 'wincent/terminus'
+Plug 'yggdroot/indentline'
+Plug 'yuttie/comfortable-motion.vim'
+
+call plug#end()
+
+""" KEYBINDINGS
+let g:vroom_map_keys = 0
 let g:mapleader = "\<Space>"
 let g:maplocalleader = '\'
 nnoremap ZQ :qa<cr>
@@ -10,13 +63,18 @@ inoremap jk <esc>
 cnoremap jk <esc>
 nnoremap <leader>feR :source /home/vincent/.vimrc <bar> PlugInstall<cr>
 nnoremap <leader>fer :source /home/vincent/.vimrc<cr>
-nnoremap <leader>ss :%S//g<left><left>
-vnoremap <leader>ss :S//g<left><left>
-nnoremap <leader>rr :%S/<C-r>0//g<left><left>
-vnoremap <leader>rr :S/<C-r>0//g<left><left>
+nnoremap <leader>ss :%s//g<left><left>
+vnoremap <leader>ss :s//g<left><left>
+nnoremap <leader>rr :%s/<C-r>0//g<left><left>
+vnoremap <leader>rr :s/<C-r>0//g<left><left>
+nnoremap <leader>SS :%S//g<left><left>
+vnoremap <leader>SS :S//g<left><left>
+nnoremap <leader>RR :%S/<C-r>0//g<left><left>
+vnoremap <leader>RR :S/<C-r>0//g<left><left>
 nnoremap <leader>co :g//z#.5 <bar> echo "=========="<home><right><right>
 vnoremap <leader>dl :g/^$/d<cr>
-noremap <leader>y "ry
+noremap <leader>Y "Ryy
+noremap <leader>D "Rdd
 noremap ' "
 noremap <cr> :
 noremap <C-j> <cr>
@@ -36,18 +94,16 @@ nnoremap <silent>zz :MaximizerToggle<CR>
 vnoremap <silent>zz :MaximizerToggle<CR>gv
 map <C-l> :NERDTreeToggle<CR>
 nnoremap <localleader><localleader> :Make<CR>
-nnoremap -- :bprev<cr>
-nnoremap == :bnext<cr>
-nnoremap `` :bdelete<cr>
+nnoremap -- :tabprev<cr>
+nnoremap == :tabnext<cr>
+nnoremap `` :tabclose<cr>
 nnoremap <silent><esc> :nohl<cr>
-nmap <leader>pi :call pry#insert()<cr>
 nnoremap <leader>wo :ToggleWorkspace<CR>
-map <Leader>tf :call RunCurrentSpecFile()<CR>
-map <Leader>tn :call RunNearestSpec()<CR>
-map <Leader>tt :call RunLastSpec()<CR>
-map <Leader>ta :call RunAllSpecs()<CR>
+map <Leader>tf :VroomRunTestFile<CR>
+map <Leader>tn :VroomRunNearestTest<CR>
+map <Leader>tt :VroomRunLastTest<CR>
 nmap <Leader>f :Files<CR>
-nmap <Leader><leader> :GFiles<CR>
+nmap <Leader><leader> :GFiles?<CR>
 nmap <Leader>bb :Buffers<CR>
 nmap <Leader>h :History<CR><Paste>
 nmap <Leader>bt :BTags<CR>
@@ -77,6 +133,7 @@ nnoremap <localleader>c :LspCodeAction<CR>
 nnoremap <silent> K :LspHover<CR>
 nnoremap <silent> <localleader>d :LspPeekDefinition<CR>
 nnoremap <silent> <localleader>r :LspRename<CR>
+nnoremap <silent> gd :LspDefinition<CR>
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 inoremap <expr> <C-e> pumvisible() ? asyncomplete#cancel_popup() : "\<C-e>"
@@ -84,6 +141,10 @@ vnoremap <silent> al :<c-u>norm!0v$h<cr>
 vnoremap <silent> il :<c-u>norm!^vg_<cr>
 onoremap <silent> al :norm val<cr>
 onoremap <silent> il :norm vil<cr>
+omap ih <Plug>(GitGutterTextObjectInnerPending)
+omap ah <Plug>(GitGutterTextObjectOuterPending)
+xmap ih <Plug>(GitGutterTextObjectInnerVisual)
+xmap ah <Plug>(GitGutterTextObjectOuterVisual)
 
 let @p="orequire 'pry'; binding.pryjk"
 let @j="A;jkJ"
@@ -96,115 +157,40 @@ let @q="khrX"
 let @z="jhrX"
 let @c="jlrX"
 
-let g:wordmotion_prefix = '-'
-let g:wordmotion_spaces = '_-'
-
 set noswapfile
 let g:workspace_session_directory = $HOME . '/.vim/sessions/'
 
+""" AESTHETICS
+
+colorscheme nord
 set cursorline
 set scrolloff=10
 let g:comfortable_motion_friction = 200.0
 let g:comfortable_motion_air_drag = 12.0
 set nowrap
-set number relativenumber
-augroup numbertoggle
-  autocmd!
-  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
-  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
-augroup END
 
-set tabstop=4
-set shiftwidth=4
-set expandtab
-
-runtime macros/matchit.vim
-
-call plug#begin()
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-projectionist'
-Plug 'tpope/vim-rsi'
-Plug 'tpope/vim-abolish'
-Plug 'thaerkh/vim-workspace'
-Plug 'editorconfig/editorconfig-vim'
-Plug 'thoughtbot/vim-rspec'
-Plug 'rbgrouleff/bclose.vim'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'dominikduda/vim_current_word'
-Plug 'yggdroot/indentline'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'ryanoasis/vim-devicons'
-Plug 'airblade/vim-gitgutter'
-Plug 'markonm/traces.vim'
-Plug 'kana/vim-textobj-user'
-Plug 'kana/vim-textobj-entire'
-Plug 'tek/vim-textobj-ruby'
-Plug 'michaeljsmith/vim-indent-object'
-Plug 'saaguero/vim-textobj-pastedtext'
-Plug 'gilligan/textobj-gitgutter'
-Plug 'Julian/vim-textobj-variable-segment'
-Plug 'wellle/targets.vim'
-Plug 'raimondi/delimitmate'
-Plug 'machakann/vim-highlightedyank'
-Plug 'andrewradev/splitjoin.vim'
-Plug 'justinmk/vim-sneak'
-Plug 'flazz/vim-colorschemes'
-Plug 'liuchengxu/vim-which-key'
-Plug 'szw/vim-maximizer'
-" Plug 'tmux-plugins/vim-tmux-focus-events'
-Plug 'wincent/terminus'
-Plug 'tmux-plugins/vim-tmux'
-Plug 'roxma/vim-tmux-clipboard'
-Plug 'yuttie/comfortable-motion.vim'
-Plug 'Shougo/neco-vim'
-Plug 'prabirshrestha/asyncomplete.vim'
-Plug 'prabirshrestha/asyncomplete-necovim.vim'
-Plug 'wellle/tmux-complete.vim'
-Plug 'prabirshrestha/async.vim'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'prabirshrestha/asyncomplete-lsp.vim'
-call plug#end()
-
-set hidden
-
-set completeopt+=preview
-autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
-au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#necovim#get_source_options({
-    \ 'name': 'necovim',
-    \ 'whitelist': ['vim'],
-    \ 'completor': function('asyncomplete#sources#necovim#completor'),
-    \ }))
-if executable('solargraph')
-    " gem install solargraph
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'solargraph',
-        \ 'cmd': {server_info->[&shell, &shellcmdflag, 'bundle exec solargraph stdio']},
-        \ 'initialization_options': {"diagnostics": "true"},
-        \ 'whitelist': ['ruby'],
-        \ })
-endif
-autocmd FileType ruby setlocal omnifunc=lsp#complete
-
-let g:workspace_create_new_tabs = 0
-let g:workspace_session_directory = $HOME . '/.vim/sessions/'
-
-colorscheme nord
+set number
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#bufferline#enabled = 1
-let g:airline#extensions#tabline#show_buffers = 1
+let g:airline#extensions#bufferline#enabled = 0
+let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#formatter = 'unique_tail'
 let g:airline_theme='tomorrow'
 let g:airline_section_y = ''
 let g:airline_section_z = ''
 let g:airline_skip_empty_sections = 1
 
-let g:rspec_command = "!rspec -fd {spec}"
+set signcolumn=no
+highlight link GitGutterAddLineNr Function
+highlight link GitGutterChangeLineNr ALEWarningSign
+highlight link GitGutterChangeDeleteLineNr ALEWarningSign
+highlight link GitGutterDeleteLineNr ALEErrorSign
+highlight link LspInformationText Comment
+let g:gitgutter_highlight_linenrs = 1
+
+""" TMUX
+
+let g:vroom_use_vimux=1
 
 augroup tmux
   autocmd!
@@ -213,3 +199,5 @@ augroup tmux
     autocmd VimLeave,FocusLost * call system("tmux set-window-option automatic-rename")
   endif
 augroup END
+
+
