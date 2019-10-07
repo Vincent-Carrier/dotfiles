@@ -3,6 +3,8 @@ source $ZPLUG_HOME/init.zsh
 source $HOME/bin/_fzf-funcs
 source $HOME/.lf_icons
 source /usr/local/share/chruby/chruby.sh
+source /usr/local/share/chruby/auto.sh
+chruby ruby-2.7.0-preview1
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000

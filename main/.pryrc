@@ -12,6 +12,9 @@ Pry.config.commands.alias_command "hg", "hist -T 20 -G", desc: "Up to 20 command
 Pry.config.commands.alias_command "hG", "hist -G", desc: "Commands matching expression ever used"
 Pry.config.commands.alias_command "hr", "hist -r", desc: "hist -r <command number> to run a command"
 Pry.config.commands.alias_command 'e', 'edit'
+Pry.config.commands.alias_command 'ex', 'edit -ex'
+Pry.config.commands.alias_command 'q', 'exit-program'
+Pry.config.commands.alias_command 'resume', 'break --disable-all'
 
 if defined?(PryByebug)
    def pry_debug
@@ -109,3 +112,16 @@ def more_help
   ""
  end
  puts "Run 'more_help' to see tips"
+
+
+ require 'byebug'
+ class Byebug::WhereCommand
+   def print_backtrace
+      relevant_context = (0...context.stack_size).reject { |index| context.frame_file(index) =~ /(.gem\/ruby)|(.rubies\/ruby)/  }
+      bt = prc('frame.line', relevant_context) do |index, _|
+        Frame.new(context, index).to_hash
+      end
+
+      print(bt)
+    end
+  end
