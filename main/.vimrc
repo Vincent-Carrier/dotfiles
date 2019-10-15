@@ -5,9 +5,13 @@ endif
 
 call plug#begin()
 
+Plug 'christoomey/vim-tmux-navigator'
 Plug 'ngmy/vim-rubocop'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'jeetsukumaran/vim-indentwise'
 Plug 'Julian/vim-textobj-variable-segment'
-Plug 'vim-scripts/AnsiEsc.vim'
 Plug 'mileszs/ack.vim'
 Plug 'Shougo/neco-vim'
 Plug 'airblade/vim-gitgutter'
@@ -27,11 +31,11 @@ Plug 'liuchengxu/vim-which-key'
 Plug 'machakann/vim-highlightedyank'
 Plug 'markonm/traces.vim'
 Plug 'michaeljsmith/vim-indent-object'
-Plug 'prabirshrestha/async.vim'
-Plug 'prabirshrestha/asyncomplete-lsp.vim'
-Plug 'prabirshrestha/asyncomplete-necovim.vim'
-Plug 'prabirshrestha/asyncomplete.vim'
-Plug 'prabirshrestha/vim-lsp'
+" Plug 'prabirshrestha/async.vim'
+" Plug 'prabirshrestha/asyncomplete-lsp.vim'
+" Plug 'prabirshrestha/asyncomplete-necovim.vim'
+" Plug 'prabirshrestha/asyncomplete.vim'
+" Plug 'prabirshrestha/vim-lsp'
 Plug 'raimondi/delimitmate'
 Plug 'rbgrouleff/bclose.vim'
 Plug 'roxma/vim-tmux-clipboard'
@@ -61,6 +65,8 @@ Plug 'yuttie/comfortable-motion.vim'
 
 call plug#end()
 
+let g:deoplete#enable_at_startup = 1
+
 command! -nargs=+ -range=% -complete=command Global <line1>,<line2>call <SID>global_confirm(<q-args>)
 command! -nargs=+ -range=% -complete=command G <line1>,<line2>call <SID>global_confirm(<q-args>)
 function! s:global_confirm(args) range
@@ -80,6 +86,11 @@ function! s:global_confirm(args) range
   endtry
 endfunction
 
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+let g:UltiSnipsEditSplit="vertical"
+
 """ KEYBINDINGS
 let g:mapleader = "\<Space>"
 let g:maplocalleader = '\'
@@ -87,13 +98,12 @@ nnoremap ZQ :qa<cr>
 inoremap jk <esc>
 cnoremap jk <esc>
 tnoremap jk <C-\><C-n>
-nnoremap <C-j> 4j
-nnoremap <C-k> 4k
 noremap ' :<C-p>
 noremap H ^
 noremap L $
 noremap p :set paste<CR>p:set nopaste<CR>
 nmap s <Plug>(easymotion-s)
+nnoremap <leader>us :call UltiSnips#ListSnippets()
 nnoremap <leader>feR :source /home/vincent/.vimrc <bar> PlugInstall<cr>
 nnoremap <leader>fer :source /home/vincent/.vimrc<cr>
 nnoremap <leader>ss :%s//g<left><left>
@@ -120,7 +130,6 @@ map <Leader>k <Plug>(easymotion-k)
 map <Leader>h <Plug>(easymotion-linebackward)
 nnoremap <silent> <leader>      :<c-u>WhichKey '<Space>'<CR>
 nnoremap <silent> <localleader> :<c-u>WhichKey  '\'<CR>
-map <C-l> :NERDTreeToggle<CR>
 nnoremap <localleader><localleader> :Make<CR>
 nnoremap <leader>qq :tabclose<cr>
 nnoremap <silent><esc> :nohl <bar> cclose<cr>
@@ -211,30 +220,30 @@ let @z="jhrX"
 let @c="jlrX"
 
 """ LSP
-let g:lsp_insert_text_enabled = 0
-let g:lsp_text_edit_enabled = 0
-let g:preview_float = 0
+" let g:lsp_insert_text_enabled = 0
+" let g:lsp_text_edit_enabled = 0
+" let g:preview_float = 0
 
-set completeopt+=preview
-autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
-" au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#necovim#get_source_options({
-"     \ 'name': 'necovim',
-"     \ 'whitelist': ['vim'],
-"     \ 'completor': function('asyncomplete#sources#necovim#completor'),
-"     \ }))
-if executable('solargraph')
-    " gem install solargraph
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'solargraph',
-        \ 'cmd': {server_info->[&shell, &shellcmdflag, 'bundle exec solargraph stdio']},
-        \ 'initialization_options': {"diagnostics": "true"},
-        \ 'whitelist': ['ruby'],
-        \ })
-endif
+" set completeopt+=preview
+" autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+" " au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#necovim#get_source_options({
+" "     \ 'name': 'necovim',
+" "     \ 'whitelist': ['vim'],
+" "     \ 'completor': function('asyncomplete#sources#necovim#completor'),
+" "     \ }))
+" if executable('solargraph')
+"     " gem install solargraph
+"     au User lsp_setup call lsp#register_server({
+"         \ 'name': 'solargraph',
+"         \ 'cmd': {server_info->[&shell, &shellcmdflag, 'bundle exec solargraph stdio']},
+"         \ 'initialization_options': {"diagnostics": "true"},
+"         \ 'whitelist': ['ruby'],
+"         \ })
+" endif
 
-let g:lsp_log_verbose = 1
-let g:lsp_log_file = expand('~/vim-lsp.log')
-let g:asyncomplete_log_file = expand('~/asyncomplete.log')
+" let g:lsp_log_verbose = 1
+" let g:lsp_log_file = expand('~/vim-lsp.log')
+" let g:asyncomplete_log_file = expand('~/asyncomplete.log')
 
 """ WORKSPACE
 set noswapfile
@@ -262,7 +271,6 @@ let g:comfortable_motion_friction = 200.0
 let g:comfortable_motion_air_drag = 12.0
 set nowrap
 
-set number
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_splits = 0
@@ -277,9 +285,16 @@ let g:airline_section_y = ''
 let g:airline_section_z = ''
 let g:airline_skip_empty_sections = 1
 
+augroup LineNumbers
+    autocmd!
+    autocmd WinEnter * set number
+    autocmd WinLeave * set nonumber
+augroup END
+
+
 set signcolumn=no
-set colorcolumn=80
-highlight ColorColumn ctermbg=8
+set textwidth=80
+highlight ColorColumn ctermbg=grey
 highlight link GitGutterAddLineNr Function
 highlight link GitGutterChangeLineNr ALEWarningSign
 highlight link GitGutterChangeDeleteLineNr ALEWarningSign

@@ -1,24 +1,20 @@
-export ZPLUG_HOME=/home/linuxbrew/.linuxbrew/opt/zplug
+export ZPLUG_HOME=~/.zplug
 source $ZPLUG_HOME/init.zsh
-source $HOME/bin/_fzf-funcs
+# source $HOME/bin/_fzf-funcs
 source $HOME/.lf_icons
-source /usr/local/share/chruby/chruby.sh
-source /usr/local/share/chruby/auto.sh
-chruby ruby-2.7.0-preview1
+# source /usr/local/share/chruby/chruby.sh
+# source /usr/local/share/chruby/auto.sh
+# chruby ruby-2.7.0-preview1
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=1000
 setopt SHARE_HISTORY
 
-export fpath=($HOME/.autoload $fpath)
-
-autoload -Uz _tmux_pane_words
+# export fpath=($HOME/.autoload $fpath)
 
 export FZF_BASE=/home/vincent/.fzf
-export OMNIVIM_EDITOR=nvim
-PLANG='ruby'
-PLANG_EXT='rb'
+set rtp+=~/.fzf
 
 HISTSIZE=1000
 SAVEHIST=1000
@@ -131,8 +127,8 @@ magic-enter () {
     then
             zle clear-screen
     else
-            zle accept-line
-    fi
+	zle accept-line
+fi
 }
 zle -N magic-enter
 bindkey '^J' magic-enter
@@ -150,7 +146,7 @@ bindkey '^I' $fzf_default_completion
 bindkey -s '^O' ' lf\n'
 
 alias -g HE='--help | less'
-alias -g L='| cless'
+alias -g L='| less'
 alias -g NE='2 > /dev/null'
 alias -g NUL='> /dev/null 2>&1'
 alias -g Y='| tmux loadb -'
@@ -163,9 +159,7 @@ alias gi="sudo gem install"
 alias inf=pinfo
 alias info="info --vi-keys"
 alias ls='ls --color'
-alias ov='python ~/bin/omnivim.py'
 alias please='sudo'
-alias psa='ps aux | sort -nrk 3,3 | head -n 5'
 alias publicip='curl https://ipinfo.io/ip'
 alias ra='ri -a'
 alias red='ruby -pe'
@@ -178,4 +172,3 @@ export ATHAME_ENABLED=0
 
 export LC_ALL=en_US.UTF-8
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
