@@ -5,8 +5,10 @@ endif
 
 call plug#begin()
 
-Plug 'jeetsukumaran/vim-indentwise'
+Plug 'ngmy/vim-rubocop'
 Plug 'Julian/vim-textobj-variable-segment'
+Plug 'vim-scripts/AnsiEsc.vim'
+Plug 'mileszs/ack.vim'
 Plug 'Shougo/neco-vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'janko/vim-test'
@@ -18,7 +20,7 @@ Plug 'flazz/vim-colorschemes'
 Plug 'gilligan/textobj-gitgutter'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'justinmk/vim-sneak'
+Plug 'easymotion/vim-easymotion'
 Plug 'kana/vim-textobj-entire'
 Plug 'kana/vim-textobj-user'
 Plug 'liuchengxu/vim-which-key'
@@ -34,10 +36,10 @@ Plug 'raimondi/delimitmate'
 Plug 'rbgrouleff/bclose.vim'
 Plug 'roxma/vim-tmux-clipboard'
 Plug 'ryanoasis/vim-devicons'
-Plug 'saaguero/vim-textobj-pastedtext'
 Plug 'tek/vim-textobj-ruby'
 Plug 'thaerkh/vim-workspace'
 Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-endwise'
@@ -56,20 +58,42 @@ Plug 'wellle/targets.vim'
 Plug 'wincent/terminus'
 Plug 'yggdroot/indentline'
 Plug 'yuttie/comfortable-motion.vim'
-" Plug 'roxma/vim-paste-easy'
 
 call plug#end()
 
+command! -nargs=+ -range=% -complete=command Global <line1>,<line2>call <SID>global_confirm(<q-args>)
+command! -nargs=+ -range=% -complete=command G <line1>,<line2>call <SID>global_confirm(<q-args>)
+function! s:global_confirm(args) range
+  let args = a:args
+  let sep = args[0]
+  let [pat, cmd; _] = split(args[1:], '\v([^\\](\\\\)*\\)@<!%d' . char2nr(sep), 1) + ['', '']
+  match none
+  let options = ['throw "Global: Abort"', cmd, '', 'throw "Global: Abort"']
+  let cmd = 'exe ''match IncSearch /\c\%''.line(''.'').''l''.@/.''/'''
+  let cmd .= '| redraw'
+  let cmd .= '| exe get(options, confirm("Execute?", "&yes\n&no\n&abort", 2))'
+  try
+    execute a:firstline . ',' . a:lastline . 'g'.sep.pat.sep.cmd
+  catch /Global: Abort/
+  finally
+    match none
+  endtry
+endfunction
+
 """ KEYBINDINGS
-let g:VtrUseVtrMaps = 1
 let g:mapleader = "\<Space>"
 let g:maplocalleader = '\'
 nnoremap ZQ :qa<cr>
 inoremap jk <esc>
 cnoremap jk <esc>
 tnoremap jk <C-\><C-n>
+nnoremap <C-j> 4j
+nnoremap <C-k> 4k
+noremap ' :<C-p>
 noremap H ^
 noremap L $
+noremap p :set paste<CR>p:set nopaste<CR>
+nmap s <Plug>(easymotion-s)
 nnoremap <leader>feR :source /home/vincent/.vimrc <bar> PlugInstall<cr>
 nnoremap <leader>fer :source /home/vincent/.vimrc<cr>
 nnoremap <leader>ss :%s//g<left><left>
@@ -86,44 +110,37 @@ noremap <leader>Y "Ryy
 noremap <leader>D "Rdd
 nnoremap + :cnext<cr>
 nnoremap _ :cprev<cr>
-noremap ' "
-noremap <cr> :
-noremap <C-j> <cr>
 nnoremap gm m
 noremap m "_d
 nnoremap mm "_dd
 nnoremap M "_d$
-map f <Plug>Sneak_f
-map F <Plug>Sneak_F
-map t <Plug>Sneak_t
-map T <Plug>Sneak_T
+map <Leader>l <Plug>(easymotion-lineforward)
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+map <Leader>h <Plug>(easymotion-linebackward)
 nnoremap <silent> <leader>      :<c-u>WhichKey '<Space>'<CR>
 nnoremap <silent> <localleader> :<c-u>WhichKey  '\'<CR>
-nnoremap <silent> [ :<c-u>WhichKey  '['<CR>
-nnoremap <silent> ] :<c-u>WhichKey  ']'<CR>
-nnoremap <silent>zz :MaximizerToggle<CR>
-vnoremap <silent>zz :MaximizerToggle<CR>gv
 map <C-l> :NERDTreeToggle<CR>
 nnoremap <localleader><localleader> :Make<CR>
-nnoremap `` :tabclose<cr>
-nnoremap <silent><esc> :nohl<cr>
+nnoremap <leader>qq :tabclose<cr>
+nnoremap <silent><esc> :nohl <bar> cclose<cr>
 nnoremap <leader>wo :ToggleWorkspace<CR>
 nmap <silent> <Leader>tn :TestNearest<CR>
 nmap <silent> <Leader>tf  :TestFile<CR>
 nmap <silent> <Leader>ts  :TestSuite<CR>
-nmap <silent> <Leader>tt  :TestLast<CR>
+nnoremap <silent> <CR> :TestLast<CR>
 nmap <silent> <Leader>TT  :TestLast<CR>
 nmap <silent> <Leader>tv  :TestVisit<CR>
-nmap <Leader><leader> :Files<CR>
-nmap <Leader>ff :GFiles?<CR>
-nmap <Leader>bb :Buffers<CR>
-nmap <Leader>h :History<CR><Paste>
+nmap <leader>ff :Files<CR>
+nnoremap <C-f> :GFiles?<CR>
+nnoremap <C-b> :Buffers<CR>
 nmap <Leader>bt :BTags<CR>
 nmap <Leader>ta :Tags<CR>
-nmap <Leader>l :BLines<CR>
-nmap <Leader>L :Lines<CR>
+nmap <Leader>bl :BLines<CR>
+nmap <Leader>LL :Lines<CR>
 nmap <Leader>' :Marks<CR>
 nmap <Leader>/ :Ag<CR>
+nmap <C-s> :Ack<space>
 nmap <Leader>H :Helptags!<CR>
 nmap <Leader>C :Commands<CR>
 nmap <Leader>M :Maps<CR>
@@ -140,13 +157,16 @@ nmap <leader>6 6gt
 nmap <leader>7 7gt
 nmap <leader>8 8gt
 nmap <leader>9 9gt
-nnoremap <leader><cr> :<C-p><cr>
+nnoremap <C-n> gt
+nnoremap <C-p> gT
+noremap <leader><cr> :<C-p><cr>
 nnoremap <silent> K :LspHover<CR>
 nnoremap <localleader>c :LspCodeAction<CR>
 nnoremap <silent> <localleader>d :LspPeekDefinition<CR>
 nnoremap <silent> <localleader>r :LspRename<CR>
 nnoremap <silent> <localleader>f :LspDocumentFormat<CR>
-nnoremap <silent> gd :LspDefinition<CR>
+nnoremap <silent> gd :te ri <C-r><C-w><CR>
+vnoremap <silent> gd y:te ri <C-r>0<CR>
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 let g:endwise_no_mappings = 1
@@ -161,8 +181,25 @@ omap ah <Plug>(GitGutterTextObjectOuterPending)
 xmap ih <Plug>(GitGutterTextObjectInnerVisual)
 xmap ah <Plug>(GitGutterTextObjectOuterVisual)
 nnoremap <leader>bc :g/binding/d<cr>
+nnoremap <leader>BC :bufdo G/binding/d<cr>
+let g:VtrUseVtrMaps = 1
+        " <leader>rr   |   VtrResizeRunner<cr>
+        " <leader>ror  |   VtrReorientRunner<cr>
+        " <leader>sc   |   VtrSendCommandToRunner<cr>
+        " <leader>sl   |   VtrSendLinesToRunner<cr>
+        " <leader>or   |   VtrOpenRunner<cr>
+        " <leader>kr   |   VtrKillRunner<cr>
+        " <leader>fr   |   VtrFocusRunner<cr>
+        " <leader>dr   |   VtrDetachRunner<cr>
+        " <leader>ar   |   VtrReattachRunner<cr>
+        " <leader>cr   |   VtrClearRunner<cr>
+        " <leader>fc   |   VtrFlushCommand<cr>
+nnoremap <leader>dd :VtrSjndCtrlD<CR>
+nnoremap <leader>FF :VtrSendFile<CR>
+nmap <leader>) ysiW)hx
+vmap <leader>) S)hx
 
-let @p="orequire 'pry'; binding.pry\<esc>"
+let @p="Orequire 'pry'; binding.pry\<esc>"
 let @j="A;jkJ"
 let @w="krX"
 let @x="jrX"
@@ -174,6 +211,9 @@ let @z="jhrX"
 let @c="jlrX"
 
 """ LSP
+let g:lsp_insert_text_enabled = 0
+let g:lsp_text_edit_enabled = 0
+let g:preview_float = 0
 
 set completeopt+=preview
 autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
@@ -182,16 +222,19 @@ autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 "     \ 'whitelist': ['vim'],
 "     \ 'completor': function('asyncomplete#sources#necovim#completor'),
 "     \ }))
-" if executable('solargraph')
-"     " gem install solargraph
-"     au User lsp_setup call lsp#register_server({
-"         \ 'name': 'solargraph',
-"         \ 'cmd': {server_info->[&shell, &shellcmdflag, 'bundle exec solargraph stdio']},
-"         \ 'initialization_options': {"diagnostics": "true"},
-"         \ 'whitelist': ['ruby'],
-"         \ })
-" endif
-" autocmd! FileType ruby setlocal omnifunc=lsp#complete
+if executable('solargraph')
+    " gem install solargraph
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'solargraph',
+        \ 'cmd': {server_info->[&shell, &shellcmdflag, 'bundle exec solargraph stdio']},
+        \ 'initialization_options': {"diagnostics": "true"},
+        \ 'whitelist': ['ruby'],
+        \ })
+endif
+
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('~/vim-lsp.log')
+let g:asyncomplete_log_file = expand('~/asyncomplete.log')
 
 """ WORKSPACE
 set noswapfile
@@ -200,6 +243,10 @@ let g:workspace_session_directory = $HOME . '/.vim/sessions/'
 let g:workspace_autosave_untrailspaces = 0
 let g:workspace_session_disable_on_args = 1
 
+let g:vtr_filetype_runner_overrides = {
+      \ 'ruby': 'pry -Isrc {file}',
+      \ }
+
 let g:VtrPercentage = 50
 let g:VtrOrientation = "h"
 let test#strategy = "vtr"
@@ -207,6 +254,7 @@ let test#strategy = "vtr"
 let g:fzf_buffers_jump = 1
 
 """ AESTHETICS
+set nofoldenable
 set shiftround
 colorscheme nord
 set scrolloff=10
@@ -237,6 +285,7 @@ highlight link GitGutterChangeLineNr ALEWarningSign
 highlight link GitGutterChangeDeleteLineNr ALEWarningSign
 highlight link GitGutterDeleteLineNr ALEErrorSign
 highlight link LspInformationText Comment
+highlight link LspHintText Comment
 let g:gitgutter_highlight_linenrs = 1
 
 """ TMUX
@@ -249,3 +298,9 @@ augroup tmux
   endif
 augroup END
 
+""" RUBY
+augroup ruby
+  autocmd!
+  autocmd BufLeave *.rb silent! !ctags -R
+  autocmd FileType ruby setlocal omnifunc=lsp#complete
+augroup END

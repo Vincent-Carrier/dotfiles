@@ -29,6 +29,29 @@ setopt auto_cd
 setopt prompt_subst # Make sure prompt is able to be generated properly.
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
+SSH_ENV=$HOME/.ssh/environment
+
+# start the ssh-agent
+function start_agent {
+    echo "Initializing new SSH agent..."
+    # spawn ssh-agent
+    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > ${SSH_ENV}
+    echo succeeded
+    chmod 600 ${SSH_ENV}
+    . ${SSH_ENV} > /dev/null
+    /usr/bin/ssh-add
+}
+
+if [ -f "${SSH_ENV}" ]; then
+     . ${SSH_ENV} > /dev/null
+     ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+        start_agent;
+    }
+else
+    start_agent;
+fi
+
+# Make stderr bold red
 exec 2>>( while read X; do print "\e[1;31m${X}\e[0m" > /dev/tty; done & )
 
 zplug "caiogondim/bullet-train.zsh", use:bullet-train.zsh-theme, defer:3 # defer until other plugins like oh-my-zsh is loaded
@@ -154,3 +177,5 @@ alias tau="tar -zxvf"
 export ATHAME_ENABLED=0
 
 export LC_ALL=en_US.UTF-8
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

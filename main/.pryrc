@@ -1,8 +1,8 @@
+# vim: ft=ruby
+
 require "pry-byebug"
-require "pry-stack_explorer"
 require "pry-doc"
 require "pry-rescue"
-require "pry-inline"
 
 Pry.config.color = true
 Pry.config.prompt_name = File.basename(Dir.pwd)
@@ -15,6 +15,7 @@ Pry.config.commands.alias_command 'e', 'edit'
 Pry.config.commands.alias_command 'ex', 'edit -ex'
 Pry.config.commands.alias_command 'q', 'exit-program'
 Pry.config.commands.alias_command 'resume', 'break --disable-all'
+Pry.config.commands.alias_command 'rc', 'reload-code'
 
 if defined?(PryByebug)
    def pry_debug
